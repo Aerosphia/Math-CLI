@@ -5,7 +5,7 @@ import chalkAnimation from "chalk-animation";
 import figlet from "figlet";
 import gradient from "gradient-string";
 import inquirer from "inquirer";
-import nanospinner from "nanospinner";
+import nanospinner, { createSpinner } from "nanospinner";
 import Util from "./Util.js";
 import Questions from "./Questions.js";
 
@@ -50,7 +50,8 @@ async function Init() {
     });
 
     if (areYouReadyPrompt.isReady) {
-        Questions.test();
+        // Do something later
+        process.exit();
     } else {
         process.exit();
     }
