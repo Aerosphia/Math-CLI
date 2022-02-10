@@ -10,7 +10,7 @@ import Util from "./Util.js";
 import Questions from "./Questions.js";
 
 async function Handle(callback) {
-    const spinner = createSpinner("Validating..").start();
+    const spinner = createSpinner("Validating answer..").start();
     await Util.sleep();
 
     const answerPossibilities = {
@@ -28,8 +28,6 @@ async function Handle(callback) {
 }
 
 function ParseDifficulty(difficultyInteger) {
-    console.assert(typeof difficultyInteger === "number");
-
     switch (difficultyInteger) {
         case 1:
             return chalk.green("Easy");
@@ -40,6 +38,10 @@ function ParseDifficulty(difficultyInteger) {
         default:
             throw "Could not parse difficulty: exceeds inclusive 1-3 range.";
     };
+}
+
+function Win() {
+
 }
 
 async function Init() {
