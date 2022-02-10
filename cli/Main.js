@@ -11,7 +11,7 @@ import Questions from "./Questions.js";
 
 async function Handle(callback) {
     const spinner = createSpinner("Validating..").start();
-    await Util.sleep();
+    await Util.sleep(2000);
 
     const answerPossibilities = {
         success: ["Good answer!", "Nice work.", "Brilliant.", "Exceptional.", "Genius!", "Amazing!", "Keep it up!"],
@@ -19,12 +19,27 @@ async function Handle(callback) {
     };
 
     if (callback()) {
-        spinner.success({ text: answerPossibilities.success[Math.floor(Math.random() * answerPossibilities.success.length)] });
+        spinner.success({ text: chalk.green(answerPossibilities.success[Math.floor(Math.random() * answerPossibilities.success.length)]) });
         Promise.resolve();
     } else {
-        spinner.error({ text: answerPossibilities.error[Math.floor(Math.random() * answerPossibilities.error.length)] });
-        process.exit(1);
+        spinner.error({ text: chalk.red(answerPossibilities.error[Math.floor(Math.random() * answerPossibilities.error.length)]) });
+        Promise.reject();
     }
+}
+
+function ParseDifficulty(difficultyInteger) {
+    console.assert(typeof difficultyInteger === "number");
+
+    switch (difficultyInteger) {
+        case 1:
+            return chalk.green("Easy");
+        case 2:
+            return chalk.yellow("Medium");
+        case 3:
+            return chalk.red("Hard");
+        default:
+            throw "Could not parse difficulty: exceeds inclusive 1-3 range.";
+    };
 }
 
 async function Init() {
@@ -50,10 +65,43 @@ async function Init() {
     });
 
     if (areYouReadyPrompt.isReady) {
-        // Do something later
-        process.exit();
-    } else {
-        process.exit();
+        for (const questionObject of Questions) {
+            const questionNumber = Questions.indexOf(questionObject);
+            const stringQuestionNumber = questionNumber.toString();
+
+            const direction = questionObject.direction;
+            const difficulty = questionObject.difficulty;
+            const question = questionObject.question;
+            const questionChoices = questionObject.choices;
+            const correctAnswer = questionObject.correctAnswer;
+
+            const promptId = `question-${stringQuestionNumber}`;
+            const messageFormat = `
+                ${chalk.bold(`Question ${questionNumber.toString()}`)}
+                ${ParseDifficulty(difficulty)}
+                ${direction}
+                ${question}
+            `;
+
+            const prompt = await inquirer.prompt({
+                name: promptId,
+                type: "list",
+                message: messageFormat,
+                choices: questionChoices,
+            });
+
+            Handle(() => {
+                return prompt.promptId == correctAnswer;
+            }).then(() => {
+                if (questionNumber === Questions.length - 1) {
+                    // Process win, this is just a placeholder
+                    console.log("You win!");
+                    process.exit();
+                }
+            }).catch(() => {
+                process.exit();
+            })
+        }
     }
 }
 
