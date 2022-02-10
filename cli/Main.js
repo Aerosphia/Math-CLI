@@ -11,7 +11,7 @@ import Questions from "./Questions.js";
 
 async function Handle(callback) {
     const spinner = createSpinner("Validating..").start();
-    await Util.sleep(2000);
+    await Util.sleep();
 
     const answerPossibilities = {
         success: ["Good answer!", "Nice work.", "Brilliant.", "Exceptional.", "Genius!", "Amazing!", "Keep it up!"],
@@ -45,7 +45,7 @@ function ParseDifficulty(difficultyInteger) {
 async function Init() {
     const title = chalkAnimation.rainbow("Let's do some mathematics!");
 
-    await Util.sleep(2000);
+    await Util.sleep();
     title.stop();
 
     console.log(`
@@ -56,7 +56,7 @@ async function Init() {
         If you get one wrong, you will be ${chalk.red("ELIMINATED!")}
     `);
 
-    await Util.sleep(2000);
+    await Util.sleep();
 
     const areYouReadyPrompt = await inquirer.prompt({
         name: "isReady",
@@ -77,7 +77,7 @@ async function Init() {
 
             const promptId = `question-${stringQuestionNumber}`;
             const messageFormat = `
-                ${chalk.bold(`Question ${questionNumber.toString()}`)}
+                ${chalk.bold(`Question ${stringQuestionNumber}`)}
                 ${ParseDifficulty(difficulty)}
                 ${direction}
                 ${question}
