@@ -5,7 +5,7 @@ import chalkAnimation from "chalk-animation";
 import figlet from "figlet";
 import gradient from "gradient-string";
 import inquirer from "inquirer";
-import nanospinner, { createSpinner } from "nanospinner";
+import { createSpinner } from "nanospinner";
 import Util from "./Util.js";
 import Questions from "./Questions.js";
 
@@ -20,10 +20,10 @@ async function Handle(callback) {
 
     if (callback()) {
         spinner.success({ text: chalk.green(answerPossibilities.success[Math.floor(Math.random() * answerPossibilities.success.length)]) });
-        Promise.resolve();
+        return true;
     } else {
         spinner.error({ text: chalk.red(answerPossibilities.error[Math.floor(Math.random() * answerPossibilities.error.length)]) });
-        Promise.reject();
+        return false;
     }
 }
 
@@ -37,11 +37,16 @@ function ParseDifficulty(difficultyInteger) {
             return chalk.red("Hard");
         default:
             throw "Could not parse difficulty: exceeds inclusive 1-3 range.";
-    };
+    }
 }
 
 function Win() {
+    console.clear();
+    const winMessage = "Congratulations! You win!";
 
+    figlet(winMessage, (_, data) => {
+        console.log(gradient.pastel.multiline(data));
+    });
 }
 
 async function Init() {
@@ -54,7 +59,7 @@ async function Init() {
         ${chalk.bold("GETTING STARTED")}
         Answer the following mathematical questions as they proceed.
         The questions will continue to get more difficult as it goes on.
-        There are ${chalk.yellow("15 questions")} and ${chalk.purple("3 levels")} in total.
+        There are ${chalk.yellow("15 questions")} and ${chalk.magenta("3 levels")} in total.
         If you get a question wrong, you will be ${chalk.red("ELIMINATED!")}
     `);
 
@@ -68,7 +73,7 @@ async function Init() {
 
     if (areYouReadyPrompt.isReady) {
         for (const questionObject of Questions) {
-            const questionNumber = Questions.indexOf(questionObject);
+            const questionNumber = Questions.indexOf(questionObject) + 1;
             const stringQuestionNumber = questionNumber.toString();
 
             const direction = questionObject.direction;
@@ -78,12 +83,7 @@ async function Init() {
             const correctAnswer = questionObject.correctAnswer;
 
             const promptId = `question-${stringQuestionNumber}`;
-            const messageFormat = `
-                ${chalk.bold(`Question ${stringQuestionNumber}`)}
-                ${ParseDifficulty(difficulty)}
-                ${direction}
-                ${question}
-            `;
+            const messageFormat = `${chalk.bold(`Question ${stringQuestionNumber}`)}\n  ${ParseDifficulty(difficulty)}\n  ${direction}\n  ${question}`;
 
             const prompt = await inquirer.prompt({
                 name: promptId,
@@ -92,18 +92,21 @@ async function Init() {
                 choices: questionChoices,
             });
 
-            Handle(() => {
-                return prompt.promptId === correctAnswer;
-            }).then(() => {
-                console.clear();
-                if (questionNumber === Questions.length - 1) {
-                    // Process win, this is just a placeholder
-                    console.log("You win!");
-                    process.exit();
+            const status = await Handle(() => {
+                return prompt[promptId] === correctAnswer;
+            });
+
+            if (status) {
+                if (questionNumber === Questions.length) {
+                    await Util.sleep();
+                    Win();
+                    break;
                 }
-            }).catch(() => {
+            } else {
                 process.exit();
-            })
+            }
+
+            await Util.sleep();
         }
     }
 }
