@@ -36,7 +36,7 @@ function ParseDifficulty(difficultyInteger) {
         case 3:
             return chalk.red("Hard");
         default:
-            throw "Could not parse difficulty: exceeds inclusive 1-3 range.";
+            throw new RangeError("Could not parse difficulty: exceeds inclusive 1-3 range.");
     }
 }
 
@@ -50,10 +50,8 @@ function Win() {
 }
 
 async function Init() {
-    const title = chalkAnimation.rainbow("Let's do some mathematics!");
-
+    chalkAnimation.rainbow("Let's do some mathematics!");
     await Util.sleep();
-    title.stop();
 
     console.log(`
         ${chalk.bold("GETTING STARTED")}
@@ -72,6 +70,13 @@ async function Init() {
     });
 
     if (areYouReadyPrompt.isReady) {
+        const pendingSpinner = createSpinner("Starting..").start();
+
+        await Util.sleep(1000);
+        pendingSpinner.success();
+        await Util.sleep(500);
+        console.clear();
+
         for (const questionObject of Questions) {
             const questionNumber = Questions.indexOf(questionObject) + 1;
             const stringQuestionNumber = questionNumber.toString();
@@ -103,10 +108,13 @@ async function Init() {
                     break;
                 }
             } else {
+                await Util.sleep();
+                console.clear();
                 process.exit();
             }
 
             await Util.sleep();
+            console.clear();
         }
     }
 }
