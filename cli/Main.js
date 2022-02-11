@@ -55,7 +55,7 @@ async function Init() {
         Answer the following mathematical questions as they proceed.
         The questions will continue to get more difficult as it goes on.
         There are ${chalk.yellow("15 questions")} and ${chalk.purple("3 levels")} in total.
-        If you get one wrong, you will be ${chalk.red("ELIMINATED!")}
+        If you get a question wrong, you will be ${chalk.red("ELIMINATED!")}
     `);
 
     await Util.sleep();
