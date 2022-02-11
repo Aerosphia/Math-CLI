@@ -44,8 +44,15 @@ export default [
         difficulty: 2,
         question: `Find ${chalk.yellow("C")} of a circle with a ${chalk.yellow("diameter")} of ${chalk.yellow("6cm")} Note: ${chalk.italic(
             "d = 2r"
-        )} & ${chalk.italic("C = 2πr")}`,
+        )} & ${chalk.italic("C = 2πr")} & ${chalk.italic("π = 3.14")}`,
         choices: ["18.84cm", "14.51cm", "30.10cm", "5.49cm", "11.05cm"],
         correctAnswer: "18.84cm",
+    },
+    {
+        direction: "Solve for X",
+        difficulty: 2,
+        question: `Find ${chalk.yellow("X")} where ${chalk.yellow("5(x + 4) = 6x - 5")}`,
+        choices: [33, 25, 10, 11, 15.5],
+        correctAnswer: 25,
     },
 ];
