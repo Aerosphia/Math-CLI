@@ -10,7 +10,7 @@ import Util from "./Util.js";
 import Questions from "./Questions.js";
 
 async function Handle(callback) {
-    const spinner = createSpinner("Validating..").start();
+    const spinner = createSpinner("Validating answer..").start();
     await Util.sleep();
 
     const answerPossibilities = {
@@ -19,29 +19,46 @@ async function Handle(callback) {
     };
 
     if (callback()) {
-        spinner.success({ text: answerPossibilities.success[Math.floor(Math.random() * answerPossibilities.success.length)] });
+        spinner.success({ text: chalk.green(answerPossibilities.success[Math.floor(Math.random() * answerPossibilities.success.length)]) });
         Promise.resolve();
     } else {
-        spinner.error({ text: answerPossibilities.error[Math.floor(Math.random() * answerPossibilities.error.length)] });
-        process.exit(1);
+        spinner.error({ text: chalk.red(answerPossibilities.error[Math.floor(Math.random() * answerPossibilities.error.length)]) });
+        Promise.reject();
     }
+}
+
+function ParseDifficulty(difficultyInteger) {
+    switch (difficultyInteger) {
+        case 1:
+            return chalk.green("Easy");
+        case 2:
+            return chalk.yellow("Medium");
+        case 3:
+            return chalk.red("Hard");
+        default:
+            throw "Could not parse difficulty: exceeds inclusive 1-3 range.";
+    };
+}
+
+function Win() {
+
 }
 
 async function Init() {
     const title = chalkAnimation.rainbow("Let's do some mathematics!");
 
-    await Util.sleep(2000);
+    await Util.sleep();
     title.stop();
 
     console.log(`
         ${chalk.bold("GETTING STARTED")}
         Answer the following mathematical questions as they proceed.
         The questions will continue to get more difficult as it goes on.
-        There are ${chalk.yellow("30 levels")} in total.
-        If you get one wrong, you will be ${chalk.red("ELIMINATED!")}
+        There are ${chalk.yellow("15 questions")} and ${chalk.purple("3 levels")} in total.
+        If you get a question wrong, you will be ${chalk.red("ELIMINATED!")}
     `);
 
-    await Util.sleep(2000);
+    await Util.sleep();
 
     const areYouReadyPrompt = await inquirer.prompt({
         name: "isReady",
@@ -50,10 +67,44 @@ async function Init() {
     });
 
     if (areYouReadyPrompt.isReady) {
-        // Do something later
-        process.exit();
-    } else {
-        process.exit();
+        for (const questionObject of Questions) {
+            const questionNumber = Questions.indexOf(questionObject);
+            const stringQuestionNumber = questionNumber.toString();
+
+            const direction = questionObject.direction;
+            const difficulty = questionObject.difficulty;
+            const question = questionObject.question;
+            const questionChoices = questionObject.choices;
+            const correctAnswer = questionObject.correctAnswer;
+
+            const promptId = `question-${stringQuestionNumber}`;
+            const messageFormat = `
+                ${chalk.bold(`Question ${stringQuestionNumber}`)}
+                ${ParseDifficulty(difficulty)}
+                ${direction}
+                ${question}
+            `;
+
+            const prompt = await inquirer.prompt({
+                name: promptId,
+                type: "list",
+                message: messageFormat,
+                choices: questionChoices,
+            });
+
+            Handle(() => {
+                return prompt.promptId === correctAnswer;
+            }).then(() => {
+                console.clear();
+                if (questionNumber === Questions.length - 1) {
+                    // Process win, this is just a placeholder
+                    console.log("You win!");
+                    process.exit();
+                }
+            }).catch(() => {
+                process.exit();
+            })
+        }
     }
 }
 
