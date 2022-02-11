@@ -54,7 +54,7 @@ async function Init() {
         ${chalk.bold("GETTING STARTED")}
         Answer the following mathematical questions as they proceed.
         The questions will continue to get more difficult as it goes on.
-        There are ${chalk.yellow("30 levels")} in total.
+        There are ${chalk.yellow("15 questions")} and ${chalk.purple("3 levels")} in total.
         If you get one wrong, you will be ${chalk.red("ELIMINATED!")}
     `);
 
@@ -93,8 +93,9 @@ async function Init() {
             });
 
             Handle(() => {
-                return prompt.promptId == correctAnswer;
+                return prompt.promptId === correctAnswer;
             }).then(() => {
+                console.clear();
                 if (questionNumber === Questions.length - 1) {
                     // Process win, this is just a placeholder
                     console.log("You win!");
