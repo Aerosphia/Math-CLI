@@ -28,7 +28,7 @@ export default [
         difficulty: 1,
         question: chalk.yellow("6 / 3 * 2 + y = x"),
         choices: ["x = 7, y = 5", "x = 4, y = 1", "x = 6, y = 2", "x = 4, y = 3"],
-        correctAnswer: "x = 4, y = 3",
+        correctAnswer: "x = 6, y = 2",
     },
     {
         direction: "Evaluate",
