@@ -84,7 +84,7 @@ async function Init() {
         const questionStartPrompt = await inquirer.prompt({
             name: "questionStart",
             type: "input",
-            message: "Question start number?",
+            message: chalk.yellow("TM: Question start number?"),
             default: 1,
         });
 
