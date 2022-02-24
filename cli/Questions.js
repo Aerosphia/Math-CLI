@@ -55,4 +55,11 @@ export default [
         choices: [33, 25, 10, 11, 15.5],
         correctAnswer: 25,
     },
+    {
+        direction: "Evaluate",
+        difficulty: 2,
+        question: chalk.yellow("3√12"),
+        choices: [1.15, 1.32, 4.05, 2.29, 2.23],
+        correctAnswer: 2.29,
+    },
 ];
