@@ -8,6 +8,7 @@ import inquirer from "inquirer";
 import { createSpinner } from "nanospinner";
 import Util from "./Util.js";
 import Questions from "./Questions.js";
+import Configuration from "./Configuration.json" assert { type: "json" };
 
 async function Handle(callback) {
     const spinner = createSpinner("Validating answer..").start();
@@ -40,6 +41,10 @@ function ParseDifficulty(difficultyInteger) {
     }
 }
 
+function ParseQuestionNumber(input) {
+    return !isNaN(parseInt(input)) && Questions[input - 1];
+}
+
 function Win() {
     console.clear();
     const winMessage = "Congratulations! You win!";
@@ -50,8 +55,14 @@ function Win() {
 }
 
 async function Init() {
+    let QUESTION_START = 1;
+
     chalkAnimation.rainbow("Let's do some mathematics!");
-    await Util.sleep();
+    await Util.sleep(Configuration.testingMode ? 100 : 2000);
+
+    if (Configuration.testingMode) {
+        console.log(chalk.yellow("You're in testing mode. Prompts are expedited and you can choose your question start number."));
+    }
 
     console.log(`
         ${chalk.bold("GETTING STARTED")}
@@ -61,7 +72,7 @@ async function Init() {
         If you get a question wrong, you will be ${chalk.red("ELIMINATED!")}
     `);
 
-    await Util.sleep();
+    await Util.sleep(Configuration.testingMode ? 100 : 2000);
 
     const areYouReadyPrompt = await inquirer.prompt({
         name: "isReady",
@@ -69,15 +80,30 @@ async function Init() {
         message: "Are you ready to begin?",
     });
 
+    if ((Configuration.testingMode, areYouReadyPrompt.isReady)) {
+        const questionStartPrompt = await inquirer.prompt({
+            name: "questionStart",
+            type: "input",
+            message: "Question start number?",
+            default: 1,
+        });
+
+        if (ParseQuestionNumber(questionStartPrompt.questionStart)) {
+            QUESTION_START = parseInt(questionStartPrompt.questionStart);
+        }
+    }
+
     if (areYouReadyPrompt.isReady) {
         const pendingSpinner = createSpinner("Starting..").start();
 
-        await Util.sleep(1000);
+        await Util.sleep(Configuration.testingMode ? 200 : 1000);
         pendingSpinner.success();
-        await Util.sleep(500);
+        await Util.sleep(Configuration.testingMode ? 100 : 500);
         console.clear();
 
         for (const questionObject of Questions) {
+            if (Questions.indexOf(questionObject) < QUESTION_START - 1) continue;
+
             const questionNumber = Questions.indexOf(questionObject) + 1;
             const stringQuestionNumber = questionNumber.toString();
 
@@ -113,7 +139,7 @@ async function Init() {
                 process.exit();
             }
 
-            await Util.sleep();
+            await Util.sleep(Configuration.testingMode ? 500 : 2000);
             console.clear();
         }
     } else {
