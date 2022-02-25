@@ -80,7 +80,7 @@ async function Init() {
         message: "Are you ready to begin?",
     });
 
-    if ((Configuration.testingMode, areYouReadyPrompt.isReady)) {
+    if (Configuration.testingMode && areYouReadyPrompt.isReady) {
         const questionStartPrompt = await inquirer.prompt({
             name: "questionStart",
             type: "input",
