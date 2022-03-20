@@ -54,6 +54,11 @@ function Win() {
     });
 }
 
+function ClearAndExit() {
+    console.clear();
+    process.exit();
+}
+
 async function Init() {
     let QUESTION_START = 1;
 
@@ -135,16 +140,27 @@ async function Init() {
                 }
             } else {
                 await Util.sleep();
-                console.clear();
-                process.exit();
+
+                if (Configuration.testingMode) {
+                    const continuePrompt = await inquirer.prompt({
+                        name: "continue",
+                        type: "confirm",
+                        message: chalk.yellow("TM: Continue anyway?"),
+                    });
+
+                    if (!continuePrompt.continue) {
+                        ClearAndExit();
+                    }
+                } else {
+                    ClearAndExit();
+                }
             }
 
             await Util.sleep(Configuration.testingMode ? 500 : 2000);
             console.clear();
         }
     } else {
-        console.clear();
-        process.exit();
+        ClearAndExit();
     }
 }
 
